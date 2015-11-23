@@ -14,6 +14,41 @@
 using namespace std;
 using namespace cv;
 
+template <typename D>
+void Ransac(vector<vector<D> > data, int maxIter, int estimNb){
+    int matchNbMin = (3* data.size())/10;
+    Mat bestModel;
+    float bestError = INFINITY;
+    
+    for( int it = 0; it<maxIter; it ++){
+        vector<vector<D> > estimPoints = vector<vector<D> >();
+        vector<vector<D> > otherPoints = vector<vector<D> >();
+        //TODO: put estimNb points in estimPoints (chosen randomly in data)
+        
+        //TODO: Mat homo = findHomography(imput,output)
+        
+        int matchNb;
+        //itérateur sur otherPoints
+        D input = otherPoints[itOther][0];
+        D output = otherPoints[itOther][1];
+        if( distance(homo(input) - output)< d){
+            matchNb ++;
+            // add (input,output) to estimPoints
+        }
+        
+        float error  = 0.;
+        if (matchNb > matchNbMin ){
+            //TODO : evaluate new Homo with estim points
+            
+        }
+        // calculater error
+        if ( error< minError ){
+            bestModel = model;
+            minError = error;
+        }
+    }
+}
+
 int main(){
 
     Mat I1;

@@ -9,6 +9,7 @@
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
+#include "data.cpp"
 
 using namespace std;
 using namespace cv;
@@ -21,8 +22,8 @@ void Ransac(Data<T> data, int maxIter, int estimNb){
     float bestError = INFINITY;
     
     for( int it = 0; it<maxIter; it ++){
-        vector<vector<D> > estimPoints = vector<vector<D> >();
-        vector<vector<D> > otherPoints = vector<vector<D> >(data);
+        vector<T> estimPoints = vector<T>();
+        vector<T> otherPoints = vector<T>(data);
         //TODO: put estimNb points in estimPoints (chosen randomly in data)
         for( int i = 0; i<estimNb; i++){
             int rand = Math.rand() % data.size();

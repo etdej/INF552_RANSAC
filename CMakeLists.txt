@@ -6,5 +6,5 @@ INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 
 PROJECT(projet)
 
-ADD_EXECUTABLE(projet ransac.cpp)
+ADD_EXECUTABLE(projet data.cpp ransac.cpp)
 TARGET_LINK_LIBRARIES(projet ${OpenCV_LIBS})

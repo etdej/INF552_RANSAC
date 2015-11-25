@@ -10,20 +10,28 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
 
-
 using namespace std;
 using namespace cv;
 
-template <typename D>
-void Ransac(vector<vector<D> > data, int maxIter, int estimNb){
+
+template <typename T>
+void Ransac(Data<T> data, int maxIter, int estimNb){
     int matchNbMin = (3* data.size())/10;
     Mat bestModel;
     float bestError = INFINITY;
     
     for( int it = 0; it<maxIter; it ++){
         vector<vector<D> > estimPoints = vector<vector<D> >();
-        vector<vector<D> > otherPoints = vector<vector<D> >();
+        vector<vector<D> > otherPoints = vector<vector<D> >(data);
         //TODO: put estimNb points in estimPoints (chosen randomly in data)
+        for( int i = 0; i<estimNb; i++){
+            int rand = Math.rand() % data.size();
+            vector<D> randPoint = otherPoints[rand];
+            otherPoints.erase(rand);
+            estimPoints.push(randPoint);
+        }
+        
+        cout<< estimPoints.size() <<" + "<< otherPoints.size() << " = "<<data.size() << endl;
         
         //TODO: Mat homo = findHomography(imput,output)
         

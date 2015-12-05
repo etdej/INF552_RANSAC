@@ -5,6 +5,7 @@
 #include <opencv2/features2d.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <vector>
+#include <cstdlib>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -18,48 +19,54 @@ using namespace cv;
 template <typename T>
 void Ransac(Data<T> data, int maxIter, int estimNb){
     int matchNbMin = (3* data.size())/10;
-    Mat bestModel;
+    vector<float> bestModel = vector<float>();
     float bestError = INFINITY;
+    float matchError = 0.3;
     
     for( int it = 0; it<maxIter; it ++){
         vector<T> estimPoints = vector<T>();
         vector<T> otherPoints = vector<T>(data);
         //TODO: put estimNb points in estimPoints (chosen randomly in data)
         for( int i = 0; i<estimNb; i++){
-            int rand = Math.rand() % data.size();
-            vector<D> randPoint = otherPoints[rand];
+            int a = rand();
+            int rand =(a % data.vc.size());
+            T randPoint = otherPoints[rand];
             otherPoints.erase(rand);
             estimPoints.push(randPoint);
         }
         
         cout<< estimPoints.size() <<" + "<< otherPoints.size() << " = "<<data.size() << endl;
         
-        //TODO: Mat homo = findHomography(imput,output)
+        //TODO: find model
+        
+        vector<float> tempModel = data.estimModel(estimPoints);
         
         int matchNb;
         //itérateur sur otherPoints
-        D input = otherPoints[itOther][0];
-        D output = otherPoints[itOther][1];
-        if( distance(homo(input) - output)< d){
-            matchNb ++;
-            // add (input,output) to estimPoints
+        for (int i = 0; i<otherPoints.size(); i ++) {
+            float localError = data.calculateError(otherPoints[i], tempModel);
+            if (localError < matchError) {
+                matchNb ++;
+                estimPoints.push(otherPoints[i]);
+            }
+        
+        }
+        if (matchNb > matchNbMin ){
+            vector<float> model = data.estimModel(estimPoints);
+            float error = data.calculateError(estimPoints, model);
+            // calculater error
+            if ( error< bestError ){
+                bestModel = model;
+                bestError = error;
+            }
         }
         
-        float error  = 0.;
-        if (matchNb > matchNbMin ){
-            //TODO : evaluate new Homo with estim points
-            
-        }
-        // calculater error
-        if ( error< minError ){
-            bestModel = model;
-            minError = error;
-        }
     }
 }
 
 int main(){
 
+    /*
     Mat I1;
     Mat I2;
     Mat Match;
@@ -111,4 +118,5 @@ int main(){
     waitKey();
     
     return 0;
+    */
 }

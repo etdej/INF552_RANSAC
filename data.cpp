@@ -25,13 +25,15 @@ using namespace cv;
 
 template <typename T>
 class Data{
-    vector<T> data;
+    vector<T> vc;
+    int size;
     
     static int minEstNb;
     static int nbParameter;
     
     vector<float> estimModel (vector<T> estimData); //renvoie un vecteur de taille nbParameter
-    float error(vector<T> sousData, vector<float> model);
+    float calculateError(T sousData, vector<float> model); //renvoie l'erreur d'un modèle avec une donnée
+    float calculateError(vector<T> sousData, vector<float> model);// renvoie l'erreur avec une liste de donnée
     
     
 };

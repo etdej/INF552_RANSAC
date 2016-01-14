@@ -14,16 +14,15 @@ using namespace cv;
 
 template <typename T> class Data{
     public:
-        vector<T> vc;
     
         int minEstNb;
         int nbParameters;
     
     
-        virtual vector<float> estimModel (vector<T> estimData); //renvoie un vecteur de taille nbParameter
-        virtual float calculateError1(T sousData, vector<float> model); //renvoie l'erreur d'un modèle avec une donnée
-        virtual float calculateError2(vector<T> sousData, vector<float> model);// renvoie l'erreur avec une liste de donnée
-    
+        virtual vector<float> estimModel (vector<T> estimData) = 0; //renvoie un vecteur de taille nbParameter
+        virtual float calculateError1(T sousData, vector<float> model) = 0; //renvoie l'erreur d'un modèle avec une donnée
+        virtual float calculateError2(vector<T> sousData, vector<float> model) =0;// renvoie l'erreur avec une liste de donnée
+        virtual vector<T> getVc() = 0;
 };
 
 class LinearRansac : public Data<pair<float, float> >{
@@ -47,6 +46,9 @@ class LinearRansac : public Data<pair<float, float> >{
         }
     }
     
+    virtual vector<pair<float,float> > getVc(){
+        return vc;
+    }
     
     virtual vector<float> estimModel(vector<pair<float, float> > ll){
         
@@ -102,5 +104,68 @@ class LinearRansac : public Data<pair<float, float> >{
     
 };
 
+
+class HomographyRansac : public Data<pair<Point2f, Point2f> >{
+    
+public:
+    vector<pair<Point2f, Point2f> > vc;
+    
+    
+    int minEstNb = 8;
+    int nbParameters = 4;
+    
+    HomographyRansac (vector<Point2f> source, vector<Point2f> target){
+        
+        if (source.size() != target.size()) {
+            cout << "la taille de target est différente de celle de source, problème" << endl;
+        }
+        else {
+            for (int i = 0 ; i < source.size(); i++) {
+                vc.push_back(make_pair(source[i], target[i]));
+            }
+            
+            
+        }
+    }
+    
+    virtual vector<pair<Point2f, Point2f> > getVc(){
+        return vc;
+    }
+    
+    virtual vector<float> estimModel(vector<pair<Point2f, Point2f> > ll){
+        vector<Point2f> scene1;
+        vector<Point2f> scene2;
+        for( int i = 0; i<ll.size(); i++){
+            scene1.push_back(ll[i].first);
+            scene2.push_back(ll[i].second);
+        }
+        
+        Mat H = findHomography( scene1, scene2);
+        vector<float> V;
+        V.assign((float*)H.datastart, (float*)H.dataend);
+
+        return V;
+    }
+    
+    virtual float calculateError1(pair<Point2f, Point2f> d, vector<float> model){
+
+        Mat M2=Mat(2,2,CV_32FC1);
+        memcpy(M2.data,model.data(),model.size()*sizeof(float));
+        
+        return norm(M2*Mat(d.first, false) - Mat(d.second,false));
+    }
+    
+    virtual float calculateError2(vector<pair<Point2f, Point2f> > dat, vector<float> model){
+        
+        float S = 0;
+        int n = dat.size();
+        
+        for(pair<Point2f, Point2f> p : dat)
+            S += calculateError1(p, model);
+        
+        return S/n;
+    }
+    
+};
 
 #endif
